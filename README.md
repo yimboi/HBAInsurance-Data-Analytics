@@ -95,16 +95,16 @@ This analysis highlights the importance of adjusting premium structures, product
 ### 4. Exploratory Data Analysis (EDA) in SQL
 - **Summary Statistics**: Calculate key aggregate statistics (sum, average, median) for key metrics such as sum assured and premiums.
 - **Grouping by Policy Type and Status**: Explores how each different policies and statuses contributed to the premiums.
-- **Portfolio Distribution: Determine the percentage of policies in idfferent statuses,further helping to define the portfolio distribution.
+- **Portfolio Distribution**: Determine the percentage of policies in idfferent statuses,further helping to define the portfolio distribution.
 
 ### 5. Key Metrics Calculations in SQL
-- **Premiums Paid vs Sum Assured: Compares the sum assured to the median for each product type and the premiums paid to the average for each product type, which helps to identify the imbalances where the premiums do not reflect the coverage offered
-- **Client distribution based on premiums and coverage: Calculate the number of clients that fall above or below the average premium and median sum assured, which also helps to classify which clients are over or underpaying
+- **Premiums Paid vs Sum Assured**: Compares the sum assured to the median for each product type and the premiums paid to the average for each product type, which helps to identify the imbalances where the premiums do not reflect the coverage offered
+- **Client distribution based on premiums and coverage**: Calculate the number of clients that fall above or below the average premium and median sum assured, which also helps to classify which clients are over or underpaying
 
 ### 6. Diagnostic Analytics in SQL
-- **Demographics: Explore how demographics (age, gender, marital status) affect policy subscriptions, premiums payment and surrender rates
-- **Policy Surrenders: Investigate policies that have been surrendered, including which demographics groups or policy types, providing insights into the potential reasons of premium losses
+- **Demographics**: Explore how demographics (age, gender, marital status) affect policy subscriptions, premiums payment and surrender rates
+- **Policy Surrenders**: Investigate policies that have been surrendered, including which demographics groups or policy types, providing insights into the potential reasons of premium losses
 
 ### 7. Insights and Recommendations
-- **Underpriced policies: Highlight policies where clients pay below average premiums for above-average sum assured, suggesting there could be underpricing policies
-- **Policy Optimization: Re-adjust or re-evaluate the product offerings (type E, A, C & D), ensuring profitability to the company
+- **Underpriced policies**: Highlight policies where clients pay below average premiums for above-average sum assured, suggesting there could be underpricing policies
+- **Policy Optimization**: Re-adjust or re-evaluate the product offerings (type E, A, C & D), ensuring profitability to the company
