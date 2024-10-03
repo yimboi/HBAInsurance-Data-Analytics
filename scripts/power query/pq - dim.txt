@@ -265,3 +265,20 @@ let
     #"Reordered Columns" = Table.ReorderColumns(#"Removed Other Columns",{"SK - Auto Client Code", "Post Code"})
 in
     #"Reordered Columns"
+
+// Customer States
+let
+    Source = Json.Document(File.Contents("C:\Users\QS\datascience\HBA Capital\data\raw\postcodes_malaysia.json")),
+    #"Converted to Table" = Table.FromRecords({Source}),
+    #"Expanded state" = Table.ExpandListColumn(#"Converted to Table", "state"),
+    #"Expanded state1" = Table.ExpandRecordColumn(#"Expanded state", "state", {"name", "city"}, {"state.name", "state.city"}),
+    #"Expanded state.city" = Table.ExpandListColumn(#"Expanded state1", "state.city"),
+    #"Expanded state.city1" = Table.ExpandRecordColumn(#"Expanded state.city", "state.city", {"name", "postcode"}, {"state.city.name", "state.city.postcode"}),
+    #"Changed Type" = Table.TransformColumnTypes(#"Expanded state.city1",{{"state.name", type text}, {"state.city.name", type text}, {"state.city.postcode", type any}}),
+    #"Expanded state.city.postcode" = Table.ExpandListColumn(#"Changed Type", "state.city.postcode"),
+    #"Renamed Columns" = Table.RenameColumns(#"Expanded state.city.postcode",{{"state.name", "State"}, {"state.city.name", "City"}, {"state.city.postcode", "Postcode"}}),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Renamed Columns",{{"Postcode", Int64.Type}}),
+    #"Removed Columns" = Table.RemoveColumns(#"Changed Type1",{"City"}),
+    #"Removed Duplicates" = Table.Distinct(#"Removed Columns", {"Postcode"})
+in
+    #"Removed Duplicates"

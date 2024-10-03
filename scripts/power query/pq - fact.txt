@@ -1,0 +1,23 @@
+// Account
+let
+    Source = Sql.Database("DESKTOP-QS5GMB1\SQLEXPRESS", "Hong Leong"),
+    dbo_Account = Source{[Schema="dbo",Item="Account"]}[Data],
+    #"Duplicate Policy Number" = Table.DuplicateColumn(dbo_Account, "POLICY_NUMBER", "POLICY_NUMBER - Copy"),
+    #"Duplicated Column1" = Table.DuplicateColumn(#"Duplicate Policy Number", "CLIENT_CODE", "CLIENT_CODE - Copy"),
+    #"Merged Unique Key" = Table.CombineColumns(Table.TransformColumnTypes(#"Duplicated Column1", {{"POLICY_NUMBER - Copy", type text}, {"CLIENT_CODE - Copy", type text}}, "en-MY"),{"POLICY_NUMBER - Copy", "CLIENT_CODE - Copy"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"UK - Policy Client Code"),
+    #"Renamed Columns" = Table.RenameColumns(#"Merged Unique Key",{{"TYPE", "Insurance Product"}}),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Renamed Columns",{{"UK - Policy Client Code", Int64.Type}}),
+    #"Trimmed Text" = Table.TransformColumns(#"Changed Type1",{{"POLICY_STATUS", Text.Trim, type text}}),
+    Custom1 = Table.AddColumn(#"Trimmed Text", "MaxDate", each List.Max(#"Trimmed Text"[ISSUE_DATE]) - [ISSUE_DATE]),
+    #"Changed Type" = Table.TransformColumnTypes(Custom1,{{"MaxDate", Int64.Type}}),
+    #"Renamed Columns1" = Table.RenameColumns(#"Changed Type",{{"MaxDate", "Policy Term (Days)"}, {"MODAL_PREMIUM", "Modal Premium"}, {"ISSUE_DATE", "Date Issued"}, {"PLAN_CODE", "Plan Code"}, {"POLICY_STATUS", "Policy Status"}, {"PAYMENT_MODE", "Payment Mode"}, {"POLICY_NUMBER", "Policy Number"}, {"SURRENDER_DATE", "Surrender Date"}, {"SUM_ASSURED", "Sum Assured"}, {"CLIENT_CODE", "Client Code"}}),
+    #"Removed Other Columns" = Table.SelectColumns(#"Renamed Columns1",{"Policy Number", "Sum Assured", "Modal Premium", "Date Issued", "Surrender Date", "Payment Mode", "Policy Term (Days)"}),
+    #"Added Custom" = Table.AddColumn(#"Removed Other Columns", "Total Premiums Charged", each [Modal Premium] * [Payment Mode]),
+    #"Added Conditional Column" = Table.AddColumn(#"Added Custom", "Custom", each if [Payment Mode] >= 1 then [Total Premiums Charged] else if [Payment Mode] = 0 then [Modal Premium] else null),
+    #"Changed Type3" = Table.TransformColumnTypes(#"Added Conditional Column",{{"Custom", Int64.Type}}),
+    #"Changed Type2" = Table.TransformColumnTypes(#"Changed Type3",{{"Total Premiums Charged", Int64.Type}}),
+    #"Removed Columns" = Table.RemoveColumns(#"Changed Type2",{"Total Premiums Charged"}),
+    #"Renamed Columns2" = Table.RenameColumns(#"Removed Columns",{{"Custom", "Total Premiums Charged"}}),
+    #"Sorted Rows" = Table.Sort(#"Renamed Columns2",{{"Policy Number", Order.Ascending}})
+in
+    #"Sorted Rows"
