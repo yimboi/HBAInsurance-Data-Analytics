@@ -10,8 +10,8 @@ This project aims to analyze the financial performance of insurance policies for
 - **Total Premiums Charged**: RM 41.74 million
 - **Loss Ratio**: 2.78%
 - **Client Lifetime Value**: RM 143,000
-- **Number of Policies **: 4,017
-- **Number of Clients **: 3,874
+- **Number of Policies**: 4,017
+- **Number of Clients**: 3,874
 
 ## Objectives
 
