@@ -1,6 +1,6 @@
 // Account Policy Number
 let
-    Source = Sql.Database("DESKTOP-QS5GMB1\SQLEXPRESS", "Hong Leong"),
+    Source = Sql.Database("DESKTOP-QS5GMB1\SQLEXPRESS", "HBA"),
     dbo_Account = Source{[Schema="dbo",Item="Account"]}[Data],
     #"Duplicate Policy Number" = Table.DuplicateColumn(dbo_Account, "POLICY_NUMBER", "POLICY_NUMBER - Copy"),
     #"Duplicated Column1" = Table.DuplicateColumn(#"Duplicate Policy Number", "CLIENT_CODE", "CLIENT_CODE - Copy"),
@@ -19,7 +19,7 @@ in
 
 // Account Plan Code
 let
-    Source = Sql.Database("DESKTOP-QS5GMB1\SQLEXPRESS", "Hong Leong"),
+    Source = Sql.Database("DESKTOP-QS5GMB1\SQLEXPRESS", "HBA"),
     dbo_Account = Source{[Schema="dbo",Item="Account"]}[Data],
     #"Duplicate Policy Number" = Table.DuplicateColumn(dbo_Account, "POLICY_NUMBER", "POLICY_NUMBER - Copy"),
     #"Duplicated Column1" = Table.DuplicateColumn(#"Duplicate Policy Number", "CLIENT_CODE", "CLIENT_CODE - Copy"),
@@ -38,7 +38,7 @@ in
 
 // Plan Code Insurance Product
 let
-    Source = Sql.Database("DESKTOP-QS5GMB1\SQLEXPRESS", "Hong Leong"),
+    Source = Sql.Database("DESKTOP-QS5GMB1\SQLEXPRESS", "HBA"),
     dbo_Account = Source{[Schema="dbo",Item="Account"]}[Data],
     #"Duplicate Policy Number" = Table.DuplicateColumn(dbo_Account, "POLICY_NUMBER", "POLICY_NUMBER - Copy"),
     #"Duplicated Column1" = Table.DuplicateColumn(#"Duplicate Policy Number", "CLIENT_CODE", "CLIENT_CODE - Copy"),
@@ -57,7 +57,7 @@ in
 
 // Client Code Policy Status
 let
-    Source = Sql.Database("DESKTOP-QS5GMB1\SQLEXPRESS", "Hong Leong"),
+    Source = Sql.Database("DESKTOP-QS5GMB1\SQLEXPRESS", "HBA"),
     dbo_Account = Source{[Schema="dbo",Item="Account"]}[Data],
     #"Duplicate Policy Number" = Table.DuplicateColumn(dbo_Account, "POLICY_NUMBER", "POLICY_NUMBER - Copy"),
     #"Duplicated Column1" = Table.DuplicateColumn(#"Duplicate Policy Number", "CLIENT_CODE", "CLIENT_CODE - Copy"),
@@ -76,7 +76,7 @@ in
 
 // Client Code Payment Mode
 let
-    Source = Sql.Database("DESKTOP-QS5GMB1\SQLEXPRESS", "Hong Leong"),
+    Source = Sql.Database("DESKTOP-QS5GMB1\SQLEXPRESS", "HBA"),
     dbo_Account = Source{[Schema="dbo",Item="Account"]}[Data],
     #"Duplicate Policy Number" = Table.DuplicateColumn(dbo_Account, "POLICY_NUMBER", "POLICY_NUMBER - Copy"),
     #"Duplicated Column1" = Table.DuplicateColumn(#"Duplicate Policy Number", "CLIENT_CODE", "CLIENT_CODE - Copy"),
@@ -95,7 +95,7 @@ in
 
 // Client Code
 let
-    Source = Sql.Database("DESKTOP-QS5GMB1\SQLEXPRESS", "Hong Leong"),
+    Source = Sql.Database("DESKTOP-QS5GMB1\SQLEXPRESS", "HBA"),
     dbo_Customer = Source{[Schema="dbo",Item="Customer"]}[Data],
     #"Removed Other Columns" = Table.SelectColumns(dbo_Customer,{"CLIENT_CODE"}),
     #"Removed Duplicates" = Table.Distinct(#"Removed Other Columns"),
@@ -103,42 +103,9 @@ let
 in
     #"Renamed Columns"
 
-// Customer
-let
-    Source = Sql.Database("DESKTOP-QS5GMB1\SQLEXPRESS", "Hong Leong"),
-    dbo_Customer = Source{[Schema="dbo",Item="Customer"]}[Data],
-    #"Renamed Columns" = Table.RenameColumns(dbo_Customer,{{"AGE", "Age"}, {"CLIENT_CODE", "Client Code"}, {"MARITAL_STATUS", "Marital Status"}}),
-    #"Added Prefix" = Table.TransformColumns(#"Renamed Columns", {{"Age", each "Age Group " & _, type text}}),
-    #"Replaced Value" = Table.ReplaceValue(#"Added Prefix","M","Male",Replacer.ReplaceText,{"GENDER"}),
-    #"Replaced Value1" = Table.ReplaceValue(#"Replaced Value","F","Female",Replacer.ReplaceText,{"GENDER"}),
-    #"Renamed Columns1" = Table.RenameColumns(#"Replaced Value1",{{"INCOME", "Income"}, {"GENDER", "Gender"}, {"LASTUPDATE", "Latest Update"}}),
-    #"Removed Columns" = Table.RemoveColumns(#"Renamed Columns1",{"POSTCODE"}),
-    #"Sorted Rows" = Table.Sort(#"Removed Columns",{{"Latest Update", Order.Ascending}}),
-    #"Added Index" = Table.AddIndexColumn(#"Sorted Rows", "Index", 1, 1, Int64.Type),
-    #"Duplicated Column" = Table.DuplicateColumn(#"Added Index", "Client Code", "Client Code - Copy"),
-    #"Merged Columns" = Table.CombineColumns(Table.TransformColumnTypes(#"Duplicated Column", {{"Index", type text}, {"Client Code - Copy", type text}}, "en-MY"),{"Index", "Client Code - Copy"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"SK - Auto Client Code"),
-    #"PaddedClientCode" = Table.TransformColumns(#"Merged Columns", {{"SK - Auto Client Code", each Text.PadEnd(Text.From(_), 9, "0"), type  text}}),
-    #"Duplicated Column1" = Table.DuplicateColumn(PaddedClientCode, "Client Code", "Client Code - Copy"),
-    #"Duplicated Column2" = Table.DuplicateColumn(#"Duplicated Column1", "Latest Update", "Latest Update - Copy"),
-    #"Converted Julian Date" = Table.TransformColumns(#"Duplicated Column2", {{"Latest Update - Copy", each 
-        let 
-            Year = Date.Year(_),
-            DayOfYear = Date.DayOfYear(_)
-            in
-                Text.From(Year - 1900) & Text.PadStart(Text.From(DayOfYear), 3, "0"),
-        type text}
-    }),
-    #"Changed Type" = Table.TransformColumnTypes(#"Converted Julian Date",{{"Latest Update - Copy", Int64.Type}}),
-    #"Merged Columns1" = Table.CombineColumns(Table.TransformColumnTypes(#"Changed Type", {{"Latest Update - Copy", type text}, {"Client Code - Copy", type text}}, "en-MY"),{"Latest Update - Copy", "Client Code - Copy"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"UK - Client Code History"),
-    #"PaddedClientCode1" = Table.TransformColumns(#"Merged Columns1", {{"UK - Client Code History", each Text.PadEnd(Text.From(_), 12, "0"), type  text}}),
-    #"Removed Other Columns" = Table.SelectColumns(PaddedClientCode1,{"Client Code", "Income", "Latest Update", "SK - Auto Client Code"}),
-    #"Reordered Columns" = Table.ReorderColumns(#"Removed Other Columns",{"Client Code", "SK - Auto Client Code", "Income", "Latest Update"})
-in
-    #"Reordered Columns"
-
 // Customer Age
 let
-    Source = Sql.Database("DESKTOP-QS5GMB1\SQLEXPRESS", "Hong Leong"),
+    Source = Sql.Database("DESKTOP-QS5GMB1\SQLEXPRESS", "HBA"),
     dbo_Customer = Source{[Schema="dbo",Item="Customer"]}[Data],
     #"Renamed Columns" = Table.RenameColumns(dbo_Customer,{{"AGE", "Age"}, {"CLIENT_CODE", "Client Code"}, {"MARITAL_STATUS", "Marital Status"}}),
     #"Replaced Value" = Table.ReplaceValue(#"Renamed Columns","M","Male",Replacer.ReplaceText,{"GENDER"}),
@@ -170,7 +137,7 @@ in
 
 // Customer Gender
 let
-    Source = Sql.Database("DESKTOP-QS5GMB1\SQLEXPRESS", "Hong Leong"),
+    Source = Sql.Database("DESKTOP-QS5GMB1\SQLEXPRESS", "HBA"),
     dbo_Customer = Source{[Schema="dbo",Item="Customer"]}[Data],
     #"Renamed Columns" = Table.RenameColumns(dbo_Customer,{{"AGE", "Age"}, {"CLIENT_CODE", "Client Code"}, {"MARITAL_STATUS", "Marital Status"}}),
     #"Added Prefix" = Table.TransformColumns(#"Renamed Columns", {{"Age", each "Age Group " & _, type text}}),
@@ -203,7 +170,7 @@ in
 
 // Customer Marital Status
 let
-    Source = Sql.Database("DESKTOP-QS5GMB1\SQLEXPRESS", "Hong Leong"),
+    Source = Sql.Database("DESKTOP-QS5GMB1\SQLEXPRESS", "HBA"),
     dbo_Customer = Source{[Schema="dbo",Item="Customer"]}[Data],
     #"Renamed Columns" = Table.RenameColumns(dbo_Customer,{{"AGE", "Age"}, {"CLIENT_CODE", "Client Code"}, {"MARITAL_STATUS", "Marital Status"}}),
     #"Added Prefix" = Table.TransformColumns(#"Renamed Columns", {{"Age", each "Age Group " & _, type text}}),
@@ -236,7 +203,7 @@ in
 
 // Customer Post Codes
 let
-    Source = Sql.Database("DESKTOP-QS5GMB1\SQLEXPRESS", "Hong Leong"),
+    Source = Sql.Database("DESKTOP-QS5GMB1\SQLEXPRESS", "HBA"),
     dbo_Customer = Source{[Schema="dbo",Item="Customer"]}[Data],
     #"Renamed Columns" = Table.RenameColumns(dbo_Customer,{{"AGE", "Age"}, {"CLIENT_CODE", "Client Code"}, {"MARITAL_STATUS", "Marital Status"}}),
     #"Added Prefix" = Table.TransformColumns(#"Renamed Columns", {{"Age", each "Age Group " & _, type text}}),
