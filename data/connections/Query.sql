@@ -136,7 +136,6 @@ ORDER BY POLICY_NUMBER ASC;
 
 -- Counting the distribution of packages with respect to the premiums and sum assured
 -- Count number of clients when the sum assured and premiums are lower than the median and average respectively
-
 WITH s1 AS (
     SELECT
 		CLIENT_CODE,
@@ -152,9 +151,9 @@ WITH s1 AS (
 )
 SELECT
 	s2.sum_assured_outcome,
-	COUNT(s2.sum_assured_outcome) AS no_of_clients,
+	COUNT(s2.sum_assured_outcome) AS no_of_policies,
 	s2.premiums_outcome,
-	COUNT(s2.premiums_outcome) AS no_of_clients
+	COUNT(s2.premiums_outcome) AS no_of_policies
 FROM (
 	SELECT CASE 
 				WHEN s1.sum_assured >= s1.median_sum_assured THEN 'Y'
@@ -168,7 +167,7 @@ WHERE s2.sum_assured_outcome = 'N'
 AND s2.premiums_outcome = 'N'
 GROUP BY s2.sum_assured_outcome, s2.premiums_outcome
 
--- In total, there are 440 clients (10.95% out of 4,017 records) whose insured packages are lower than the median and their premiums are lower than the average
+-- In total, there are 440 policies (10.95% out of 4,017 records) whose insured packages are lower than the median and their premiums are lower than the average
 -- The clients are paid equivalent to the coverage their received
 
 
@@ -189,9 +188,9 @@ WITH s1 AS (
 )
 SELECT
 	s2.sum_assured_outcome,
-	COUNT(s2.sum_assured_outcome) AS no_of_clients,
+	COUNT(s2.sum_assured_outcome) AS no_of_policies,
 	s2.premiums_outcome,
-	COUNT(s2.premiums_outcome) AS no_of_clients
+	COUNT(s2.premiums_outcome) AS no_of_policies
 FROM (
 	SELECT CASE 
 				WHEN s1.sum_assured >= s1.median_sum_assured THEN 'Y'
@@ -205,7 +204,7 @@ WHERE s2.sum_assured_outcome = 'Y'
 AND s2.premiums_outcome = 'Y'
 GROUP BY s2.sum_assured_outcome, s2.premiums_outcome
 
--- In total, there are 1,460 clients (36.35% out of 4,017 records) whose insured packages are higher than the median and their premiums are higher than the average
+-- In total, there are 1,480 policies (36.35% out of 4,017 records) whose insured packages are higher than the median and their premiums are higher than the average
 -- This is the standard usual model, assuming this clients are paid equivalent to the coverage their received
 
 -- Count number of clients when the sum assured are higher than the median and premiums are lower than the average
@@ -224,9 +223,9 @@ WITH s1 AS (
 )
 SELECT
 	s2.sum_assured_outcome,
-	COUNT(s2.sum_assured_outcome) AS no_of_clients,
+	COUNT(s2.sum_assured_outcome) AS no_of_policies,
 	s2.premiums_outcome,
-	COUNT(s2.premiums_outcome) AS no_of_clients
+	COUNT(s2.premiums_outcome) AS no_of_policies
 FROM (
 	SELECT CASE 
 				WHEN s1.sum_assured >= s1.median_sum_assured THEN 'Y'
@@ -239,7 +238,7 @@ FROM (
 WHERE s2.sum_assured_outcome = 'Y'
 AND s2.premiums_outcome = 'N'
 GROUP BY s2.sum_assured_outcome, s2.premiums_outcome
--- In total, there are 380 clients (9.45% out of 4,017 records) whose insured packages are higher than the median and their premiums are lower than the average
+-- In total, there are 380 policies (9.45% out of 4,017 records) whose insured packages are higher than the median and their premiums are lower than the average
 -- Quite significantly low number (disproportionate)
 -- This means this set of customers could have been underpriced relative to their coverage
 -- Pose a risk to the company should the clients make claims
@@ -261,22 +260,22 @@ WITH s1 AS (
 )
 SELECT
 	s2.sum_assured_outcome,
-	COUNT(s2.sum_assured_outcome) AS no_of_clients,
+	COUNT(s2.sum_assured_outcome) AS no_of_policies,
 	s2.premiums_outcome,
-	COUNT(s2.premiums_outcome) AS no_of_clients
+	COUNT(s2.premiums_outcome) AS no_of_policies
 FROM (
 	SELECT CASE 
-				WHEN s1.sum_assured > s1.median_sum_assured THEN 'Y'
+				WHEN s1.sum_assured >= s1.median_sum_assured THEN 'Y'
 				ELSE 'N' END AS sum_assured_outcome,
 			CASE 
-				WHEN s1.premiums_paid > s1.avg_premiums THEN 'Y'
+				WHEN s1.premiums_paid >= s1.avg_premiums THEN 'Y'
 				ELSE 'N' END AS premiums_outcome
 	FROM s1
 	) AS s2
 WHERE s2.sum_assured_outcome = 'N'
 AND s2.premiums_outcome = 'Y'
 GROUP BY s2.sum_assured_outcome, s2.premiums_outcome
--- In total, there are 1,736 clients (43.22% out of 4,017 records) whose insured packages are lower than the median and their premiums are higher than the average
+-- In total, there are 1,716 policies (43.22% out of 4,017 records) whose insured packages are lower than the median and their premiums are higher than the average
 -- Quite significantly high number (disproportionate) 
 -- This means this set of customers could have been underpaid for less amount of coverage
 
